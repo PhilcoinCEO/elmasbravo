@@ -105,6 +105,7 @@
   .video-bg video.on{opacity:.9}
   .kb-slide{position:absolute;inset:-6%;background-size:cover;background-position:center 30%;opacity:0;filter:brightness(.9) saturate(1.1);transition:opacity 2.5s ease}
   .kb-slide.active{opacity:.75;animation:kburns 12s ease-in-out forwards}
+  @media(max-width:820px){.kb-slide.active{opacity:.9}.kb-slide{filter:brightness(1) saturate(1.1)}}
   @keyframes kburns{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.14) translate(-1.5%,1.5%)}}
   .hero-overlay{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:radial-gradient(ellipse at 42% 55%, rgba(10,10,10,.55) 0%, rgba(10,10,10,.25) 55%, rgba(10,10,10,.05) 100%),
@@ -842,8 +843,10 @@
     mv.addEventListener('error', function(){ mv.remove(); });
     vbg.appendChild(mv);
 
-    /* Live fight video layer on top — only when hosted over http(s); YouTube blocks file:// embeds */
-    if(location.protocol === 'http:' || location.protocol === 'https:'){
+    /* Live fight video layer — desktop only: phones block YouTube background
+       autoplay and the paused frame would cover the photo slideshow */
+    var isDesktop = window.matchMedia('(hover:hover) and (min-width:821px)').matches;
+    if(isDesktop && (location.protocol === 'http:' || location.protocol === 'https:')){
       var vid = vbg.dataset.yt;
       var bg = document.createElement('iframe');
       bg.src = 'https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&loop=1&playlist='+vid+'&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&start=5';
