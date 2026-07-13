@@ -839,14 +839,29 @@
        this HTML file and it plays as the hero background automatically.
        No stock footage — his photos above are the fallback. */
     var mv = document.createElement('video');
-    mv.autoplay = true; mv.muted = true; mv.loop = true;
+    mv.muted = true; mv.loop = true; mv.autoplay = true;
     mv.setAttribute('muted','');
+    mv.setAttribute('autoplay','');
+    mv.setAttribute('loop','');
     mv.setAttribute('playsinline','');
+    mv.setAttribute('webkit-playsinline','');
+    mv.setAttribute('preload','auto');
     mv.setAttribute('aria-hidden','true');
     mv.src = 'bravo-hero.mp4';
-    mv.addEventListener('canplay', function(){ mv.classList.add('on'); mv.play().catch(function(){}); });
+    var played = false;
+    function tryPlay(){
+      var p = mv.play();
+      if(p && p.then) p.then(function(){ played = true; mv.classList.add('on'); }).catch(function(){});
+    }
+    mv.addEventListener('canplay', function(){ mv.classList.add('on'); if(!played) tryPlay(); });
+    mv.addEventListener('playing', function(){ played = true; mv.classList.add('on'); });
     mv.addEventListener('error', function(){ mv.remove(); });
     vbg.appendChild(mv);
+    tryPlay();
+    /* iOS fallback: first touch counts as a gesture — retry playback */
+    ['touchstart','click'].forEach(function(ev){
+      document.addEventListener(ev, function(){ if(!played) tryPlay(); }, {once:true, passive:true});
+    });
 
     /* Live fight video layer — desktop only: phones block YouTube background
        autoplay and the paused frame would cover the photo slideshow */
